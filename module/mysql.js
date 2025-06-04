@@ -61,11 +61,11 @@ class DatabaseTransaction {
           throw new Error('事务未开启，无法使用事务执行');
         }
         const [results] = await this.connection.query(query, params);
-        console.log('查询成功（事务）:', results);
+        // console.log('查询成功（事务）:', results);
         return results;
       } else {
         const [results] = await pool.query(query, params);
-        console.log('查询成功（普通）:', results);
+        // console.log('查询成功（普通）:', results);
         return results;
       }
     } catch (err) {
