@@ -1,5 +1,5 @@
 const { DatabaseTransaction } = require("../module/mysql")
-const { sendMessage } = require("../module/sendMessage")
+const { sendMessage } = require("../module/send")
 const { ysmc } = require("../module/time")
 
 async function info(bot,msg){
@@ -16,12 +16,12 @@ async function info(bot,msg){
             return
         }
         const text = `
-【个人信息】
+<b>【个人信息】</b>
 用户名称：【${nickName}】
 注册时间：【${ysmc(result[0].start)}】
 到期时间：【${ysmc(result[0].end)}】
 试用状态：【${result[0].istry ? "不可试用" : "可试用"}】
-当前状态：【${result[0].active ? "激活" : "过期"}】
+当前状态：<b>【${result[0].active ? "激活" : "过期"}】</b>
         `
         sendMessage(bot,text,chatId)
     }catch(err){

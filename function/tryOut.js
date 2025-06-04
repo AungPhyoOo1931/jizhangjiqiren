@@ -1,5 +1,5 @@
 const {DatabaseTransaction} = require('../module/mysql')
-const {sendMessage} = require('../module/sendMessage')
+const {sendMessage} = require('../module/send')
 const info = require('./info')
 async function tryOut(bot,msg){
     const chatId = msg.chat.id
