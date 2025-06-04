@@ -8,6 +8,7 @@ const datail = require('./function/detail')
 const {isPrivate,isGroup,isAdmin} = require('./module/checkers')
 const startbot = require('./function/startbot')
 const lock = require('./function/lock')
+const recordding = require('./function/recordding')
 const bot = new TelegramBot(token,{polling:true})
 
 bot.onText(/^\/start$/,(msg) => {
@@ -56,5 +57,10 @@ bot.onText(/^下课$/,(msg) => {
     isAdmin(lock)(bot,msg,false)
 })
 
+const pattern = /^(?:(?<text>[^\d+\/\s]+)\+|\+)?(?<num1>\d+(?:\.\d+)?)(?:\/(?<num2>\d+(?:\.\d+)?))?$/;
+
+bot.onText(pattern, (msg, match) => {
+    isAdmin(recordding) (bot,msg,match)
+});
 
 
