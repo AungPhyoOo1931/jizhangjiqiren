@@ -1,3 +1,10 @@
+/*
+ * Project: 记账机器人
+ * Author: AungPhyoOo1931
+ * License: MIT
+ * Year: 2025
+ */
+
 //发送消息函数
 function sendMessage(bot,text,chatId){
     const options = {
