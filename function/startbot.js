@@ -23,8 +23,8 @@ async function startbot(bot,msg){
         const checkGroup = await db.executeQuery(checkGroupSql,[chatId],false)
         
         if(checkGroup.length === 0){
-            const insertGroupSql = 'INSERT INTO groupList (id,userid,username,nickname,active) VALUE (?,?,?,?,?)'
-            const insertGroup = await db.executeQuery(insertGroupSql,[chatId,userId,username,nickname,active],false)
+            const insertGroupSql = 'INSERT INTO groupList (id,userid,username,nickname,active,start) VALUE (?,?,?,?,?,?)'
+            await db.executeQuery(insertGroupSql,[chatId,userId,username,nickname,active,true],false)
             normalSend(bot,'机器人开始记录此群',chatId)
             return
         }        

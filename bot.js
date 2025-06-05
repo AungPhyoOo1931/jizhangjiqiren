@@ -8,7 +8,10 @@ const datail = require('./function/detail')
 const {isPrivate,isGroup,isAdmin} = require('./module/checkers')
 const startbot = require('./function/startbot')
 const lock = require('./function/lock')
+const changEg = require('./function/changeEg')
 const recordding = require('./function/recordding')
+const stop = require('./function/stop')
+const outusdt = require('./function/outusdt')
 const bot = new TelegramBot(token,{polling:true})
 
 bot.onText(/^\/start$/,(msg) => {
@@ -58,9 +61,23 @@ bot.onText(/^下课$/,(msg) => {
 })
 
 const pattern = /^(?:(?<text>[^\d+\/\s]+)\+|\+)?(?<num1>\d+(?:\.\d+)?)(?:\/(?<num2>\d+(?:\.\d+)?))?$/;
-
 bot.onText(pattern, (msg, match) => {
     isAdmin(recordding) (bot,msg,match)
 });
 
+bot.onText(/^暂停$/,(msg) => {
+    isAdmin(stop)(bot,msg,false)
+})
+
+bot.onText(/^继续$/,(msg) => {
+    isAdmin(stop)(bot,msg,true)
+})
+
+bot.onText(/^设置汇率\+?([\d.]+)$/,(msg,match) => {
+    isAdmin(changEg)(bot,msg,match)
+})
+
+bot.onText(/^下发\+?([\d.]+)$/,(msg,match) => {
+    isAdmin(outusdt)(bot,msg,match)
+})
 
