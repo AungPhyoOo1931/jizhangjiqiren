@@ -23,7 +23,7 @@ class DatabaseTransaction {
     this.transactionActive = true;
     console.log('事务已开始');
   }
-
+ 
   async commitTransaction() {
     if (!this.transactionActive || !this.connection) {
       throw new Error('没有活跃的事务');

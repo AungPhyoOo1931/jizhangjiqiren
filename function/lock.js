@@ -15,7 +15,7 @@ async function lock(bot,msg,status){
             can_add_web_page_previews: status,
             can_change_info: status,
             can_invite_users: status,
-            can_pin_messages: status
+            can_pin_messages: status 
         })
         if(status){
             normalSend(bot,'禁言已关闭',chatId)

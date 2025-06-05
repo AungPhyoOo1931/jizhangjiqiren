@@ -5,7 +5,7 @@ async function exchange(bot,msg,match){
     const chatId = msg.chat.id
     const temp = match[1]
     const exchange = parseFloat(temp)
-    if(isNaN(exchange)){
+    if(isNaN(exchange)){ 
         normalSend(bot,'请输入正确的汇率如：7.20',chatId)
         return
     }

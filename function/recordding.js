@@ -17,7 +17,7 @@ async function recordding(bot,msg,match){
         const tempexchange = await db.executeQuery('SELECT echange,active,start FROM groupList WHERE id = ?',[chatId],false)
         if(tempexchange.length === 0){
             normalSend(bot,'当前群组未注册，请机器人拥有者发送‘开始’来注册并使用',chatId)
-            return
+            return 
         }
         if(tempexchange[0].start === 0){
             normalSend(bot,'机器人暂停记账中，请先发送“继续”',chatId)

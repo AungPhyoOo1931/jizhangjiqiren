@@ -21,6 +21,7 @@ function normalSend(bot,text,chatId){
     bot.sendMessage(chatId,text,options)
 }
 
+
 function replySend(bot,text,chatId,message_id){
     const options = {
         parse_mode:'HTML',

@@ -47,6 +47,7 @@ ${outText}
 已下发：${outtotal}
 未下发：${inUSDTtotal - outtotal}
         `
+        
         normalSend(bot,text,chatId)
         
     }catch(err){
@@ -54,5 +55,6 @@ ${outText}
         return
     }
 }
+
 
 module.exports = showAll

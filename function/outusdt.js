@@ -6,7 +6,7 @@ async function outusdt(bot,msg,match){
     const chatId = msg.chat.id
     const messageId = msg.message_id
     const temp = match[1]
-    const amount = parseFloat(temp)
+    const amount = parseFloat(temp) 
     if(isNaN(amount)){
         normalSend(bot,'请输入正确的下发数量',chatId)
         return

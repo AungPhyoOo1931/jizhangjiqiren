@@ -2,7 +2,7 @@ const { DatabaseTransaction } = require("../module/mysql")
 const { normalSend } = require("../module/send")
 
 async function start(bot,msg,status){
-    const chatId = msg.chat.id
+    const chatId = msg.chat.id 
     try{
         const db = new DatabaseTransaction()
         await db.executeQuery('UPDATE groupList SET start = ? WHERE id = ?',[status,chatId],false)   

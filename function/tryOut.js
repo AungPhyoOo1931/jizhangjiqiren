@@ -3,7 +3,7 @@ const {sendMessage} = require('../module/send')
 const info = require('./info')
 async function tryOut(bot,msg){
     const chatId = msg.chat.id
-    const userId = msg.from.id
+    const userId = msg.from.id 
     const nickName = (msg.from.first_name || "") + (msg.from.last_name || "")
     const username = msg.from.username || ""
     try{

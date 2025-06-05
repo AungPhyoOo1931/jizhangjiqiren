@@ -14,7 +14,7 @@ const stop = require('./function/stop')
 const outusdt = require('./function/outusdt')
 const bot = new TelegramBot(token,{polling:true})
 
-bot.onText(/^\/start$/,(msg) => {
+bot.onText(/^\/start$/,(msg) => { 
     isPrivate(start)(bot, msg);
 })
 

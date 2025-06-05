@@ -16,7 +16,7 @@ function isPrivate(handler) {
       }
       return handler(bot, msg, ...args);
     };
-  }
+  } 
   
   function isAdmin(handler) {
     return async (bot, msg, ...args) => {
