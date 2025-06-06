@@ -77,7 +77,7 @@
 ### 第一步：克隆项目并安装依赖
 
 ```bash
-git clone https://github.com/你的仓库地址.git
+git clone https://github.com/AungPhyoOo1931/jizhangjiqiren.git
 cd 项目目录
 npm install
 ```
