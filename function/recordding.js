@@ -7,7 +7,7 @@
 
 const { DatabaseTransaction } = require("../module/mysql");
 const { sendMessage, normalSend } = require("../module/send");
-const showAll = require("../module/show");
+const {showAll} = require("../module/show");
 
 async function recordding(bot,msg,match){
     const groups = match.groups;
@@ -52,7 +52,7 @@ async function recordding(bot,msg,match){
         showAll(bot,msg)
     }catch(err){
         console.log(err);
-        
+        return
     }
 
 }

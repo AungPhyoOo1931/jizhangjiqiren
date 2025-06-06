@@ -19,6 +19,8 @@ const changEg = require('./function/changeEg')
 const recordding = require('./function/recordding')
 const stop = require('./function/stop')
 const outusdt = require('./function/outusdt')
+const clearAll = require('./module/clearAll')
+const { showMe } = require('./module/show')
 const bot = new TelegramBot(token,{polling:true})
 
 bot.onText(/^\/start$/,(msg) => { 
@@ -88,3 +90,16 @@ bot.onText(/^下发\+?([\d.]+)$/,(msg,match) => {
     isAdmin(outusdt)(bot,msg,match)
 })
 
+bot.onText(/^清除账单$/,(msg) => {
+    isAdmin(clearAll)(bot,msg)
+})
+
+bot.onText(/^账单$/,(msg) => {
+    const tempname = ((msg.reply_to_message?.from?.first_name || '') + (msg.reply_to_message?.from?.last_name || '')) || null
+    if(tempname){
+        isAdmin(showMe)(bot,msg,tempname)
+    } else{
+        const name = (msg.from.first_name || '') + (msg.from.last_name || '')
+        isGroup(showMe)(bot,msg,name)
+    }
+})

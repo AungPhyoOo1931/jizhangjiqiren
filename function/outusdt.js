@@ -7,7 +7,7 @@
 
 const { DatabaseTransaction } = require("../module/mysql")
 const { replySend } = require("../module/send")
-const showAll = require("../module/show")
+const {showAll} = require("../module/show")
 
 async function outusdt(bot,msg,match){
     const chatId = msg.chat.id
