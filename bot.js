@@ -21,6 +21,7 @@ const stop = require('./function/stop')
 const outusdt = require('./function/outusdt')
 const clearAll = require('./module/clearAll')
 const { showMe } = require('./module/show')
+const { canclein, cancleUSDT } = require('./function/cancle')
 const bot = new TelegramBot(token,{polling:true})
 
 bot.onText(/^\/start$/,(msg) => { 
@@ -102,4 +103,12 @@ bot.onText(/^账单$/,(msg) => {
         const name = (msg.from.first_name || '') + (msg.from.last_name || '')
         isGroup(showMe)(bot,msg,name)
     }
+})
+
+bot.onText(/^撤销入款$/,(msg) => {
+    isAdmin(canclein)(bot,msg)
+})
+
+bot.onText(/^撤销下发$/,(msg) => {
+    isAdmin(cancleUSDT)(bot,msg)
 })

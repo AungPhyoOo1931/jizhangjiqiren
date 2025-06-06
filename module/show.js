@@ -26,9 +26,9 @@ async function showAll(bot,msg){
         const intotal = count[0].intotal//今日总入款
         const inUSDTtotal = count[0].inUSDTtotal//应下发
         const outtotal = count[0].outtotal//已下发
-        const innSQL = 'SELECT name,username,amount,exchange,usdt,join_in,messageid FROM recording WHERE groupid = ? AND isrecordding = 1 ORDER BY id DESC limit 5'
+        const innSQL = 'SELECT name,username,amount,exchange,usdt,join_in,messageid FROM recording WHERE groupid = ? AND isrecordding = 1 ORDER BY id DESC'
         const inn = await db.executeQuery(innSQL,[chatId],false)
-        const outSQL = 'SELECT username,nickname,amount,join_in,messageid FROM outusdt WHERE groupid = ? AND isrecordding = 1 ORDER BY id DESC limit 5'
+        const outSQL = 'SELECT username,nickname,amount,join_in,messageid FROM outusdt WHERE groupid = ? AND isrecordding = 1 ORDER BY id DESC'
         const outt = await db.executeQuery(outSQL,[chatId],false)
         const inText = inn.map(item => {
             let groupid = String(chatId).replace('-100','')
@@ -81,9 +81,9 @@ async function showMe(bot,msg,name){
     const intotal = count[0].intotal//今日总入款
     const inUSDTtotal = count[0].inUSDTtotal//应下发
     const outtotal = count[0].outtotal//已下发
-    const innSQL = 'SELECT name,username,amount,exchange,usdt,join_in,messageid FROM recording WHERE groupid = ? AND isrecordding = 1 AND name = ? ORDER BY id DESC limit 5'
+    const innSQL = 'SELECT name,username,amount,exchange,usdt,join_in,messageid FROM recording WHERE groupid = ? AND isrecordding = 1 AND name = ? ORDER BY id DESC'
     const inn = await db.executeQuery(innSQL,[chatId,name],false)
-    const outSQL = 'SELECT username,nickname,amount,join_in,messageid FROM outusdt WHERE groupid = ? AND isrecordding = 1 AND nickname = ? ORDER BY id DESC limit 5'
+    const outSQL = 'SELECT username,nickname,amount,join_in,messageid FROM outusdt WHERE groupid = ? AND isrecordding = 1 AND nickname = ? ORDER BY id DESC'
     const outt = await db.executeQuery(outSQL,[chatId,name],false)
     const inText = inn.map(item => {
         let groupid = String(chatId).replace('-100','')
