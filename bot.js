@@ -40,6 +40,11 @@ bot.onText(/^详细说明$/,(msg) => {
     isPrivate(datail)(bot,msg)
 })
 
+bot.onText(/^联系客服$/,(msg) => {
+    const chatId = msg.chat.id
+    bot.sendMessage(chatId,'客服飞机号：@caishen8867')
+})
+
 bot.onText(/^开始记账\+$/, (msg) => {
     const chatId = msg.chat.id;
     const options = {

@@ -12,7 +12,7 @@ function sendMessage(bot,text,chatId){
         reply_markup:{
             keyboard:[
                 ['开始记账+','申请试用','个人信息'],
-                ['详细说明','联系客服','自助续费']
+                ['详细说明','联系客服']
             ],
             resize_keyboard:true,
             one_time_keyboard:false
