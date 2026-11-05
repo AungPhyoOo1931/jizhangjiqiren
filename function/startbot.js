@@ -6,14 +6,13 @@
  */
 
 const { DatabaseTransaction } = require("../module/mysql")
-const { replySend, sendMessage, normalSend } = require("../module/send")
+const { replySend, normalSend } = require("../module/send")
+const { ensureOpenShift } = require("../module/shift")
 
 async function startbot(bot,msg){
     const chatId = msg.chat.id
     const messageId = msg.message_id
     try{
-        console.log(msg);
-        
         const userId = msg.from.id
         const username = msg.chat.username || null
         const nickname = msg.chat.title || null
@@ -24,19 +23,24 @@ async function startbot(bot,msg){
             replySend(bot,'当前账户未注册，此命令只有机器人拥有者可使用',chatId,messageId)
             return
         }
-        
+
         const active = check[0].active
         const checkGroupSql = 'SELECT id FROM groupList WHERE id = ?'
         const checkGroup = await db.executeQuery(checkGroupSql,[chatId],false)
-        
-        if(checkGroup.length === 0){
+        const isNew = checkGroup.length === 0
+
+        if(isNew){
             const insertGroupSql = 'INSERT INTO groupList (id,userid,username,nickname,active,start) VALUE (?,?,?,?,?,?)'
             await db.executeQuery(insertGroupSql,[chatId,userId,username,nickname,active,true],false)
-            normalSend(bot,'机器人开始记录此群',chatId)
+        } else {
+            await db.executeQuery('UPDATE groupList SET active = ?, start = 1 WHERE id = ?',[active,chatId],false)
+        }
+        if(Number(active) !== 1){
+            normalSend(bot,'本群已登记。当前账号未激活，请先私聊发送「申请试用」',chatId)
             return
-        }        
-        normalSend(bot,'机器人已经记录此群',chatId)
-        
+        }
+        await ensureOpenShift(db, chatId, userId)
+        normalSend(bot, isNew ? '机器人开始记录此群' : '机器人已经记录此群，继续记账',chatId)
     }catch(err){
         console.log(err);
         replySend(bot,'出现未知错误，请联系管理员！！！',chatId,messageId)

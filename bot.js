@@ -21,99 +21,114 @@ const stop = require('./function/stop')
 const outusdt = require('./function/outusdt')
 const clearAll = require('./module/clearAll')
 const { showMe } = require('./module/show')
-const { canclein, cancleUSDT } = require('./function/cancle')
-const bot = new TelegramBot(token,{polling:true})
+const { canclein, cancleUSDT, cancleReply } = require('./function/cancle')
+const { parseGroupCommand, displayName, replyUser } = require('./module/parse')
+const { migrate } = require('./migrate')
 
-bot.onText(/^\/start$/,(msg) => { 
-    isPrivate(start)(bot, msg);
-})
+function supportAccount() {
+    return String(process.env.SUPPORT_USERNAME || 'caishen8867').replace(/^@/, '')
+}
 
-bot.onText(/^申请试用$/,(msg) => {
-    isPrivate(tryOut)(bot,msg)
-})
+function botUsername() {
+    return String(process.env.BOT_USERNAME || 'teastreBot').replace(/^@/, '')
+}
 
-bot.onText(/^个人信息$/,(msg) => {
-    isPrivate(info)(bot,msg)
-})
+function register(bot) {
+    bot.onText(/^\/start$/,(msg) => {
+        isPrivate(start)(bot, msg);
+    })
 
-bot.onText(/^详细说明$/,(msg) => {
-    isPrivate(datail)(bot,msg)
-})
+    bot.onText(/^申请试用$/,(msg) => {
+        isPrivate(tryOut)(bot,msg)
+    })
 
-bot.onText(/^联系客服$/,(msg) => {
-    const chatId = msg.chat.id
-    bot.sendMessage(chatId,'客服飞机号：@caishen8867')
-})
+    bot.onText(/^个人信息$/,(msg) => {
+        isPrivate(info)(bot,msg)
+    })
 
-bot.onText(/^开始记账\+$/, (msg) => {
-    const chatId = msg.chat.id;
-    const options = {
-        reply_markup: {
-            inline_keyboard: [
-                [
-                    {
-                        text: '点击开始记账',
-                        url: 'https://t.me/teastreBot?startgroup=true'
-                    }
+    bot.onText(/^详细说明$/,(msg) => {
+        isPrivate(datail)(bot,msg)
+    })
+
+    bot.onText(/^联系客服$/,(msg) => {
+        bot.sendMessage(msg.chat.id, `客服飞机号：@${supportAccount()}`)
+    })
+
+    bot.onText(/^开始记账\+$/, (msg) => {
+        const options = {
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        {
+                            text: '点击开始记账',
+                            url: `https://t.me/${botUsername()}?startgroup=true`
+                        }
+                    ]
                 ]
-            ]
+            }
+        };
+        bot.sendMessage(msg.chat.id, '点击按钮开始记账', options);
+    });
+
+    bot.on('message', (msg) => {
+        if (!msg.text || !msg.from || msg.from.is_bot) return
+        if (msg.chat.type !== 'group' && msg.chat.type !== 'supergroup') return
+
+        const cmd = parseGroupCommand(msg.text)
+        if (!cmd) return
+
+        const run = cmd.admin === false ? isGroup : isAdmin
+
+        switch (cmd.type) {
+            case 'register':
+                return run(startbot)(bot, msg)
+            case 'classOn':
+                return run(lock)(bot, msg, true)
+            case 'classOff':
+                return run(lock)(bot, msg, false)
+            case 'recording':
+                return run(stop)(bot, msg, cmd.on)
+            case 'rate':
+                return run(changEg)(bot, msg, cmd)
+            case 'in':
+                return run(recordding)(bot, msg, cmd)
+            case 'out':
+                return run(outusdt)(bot, msg, cmd)
+            case 'clear':
+                return run(clearAll)(bot, msg)
+            case 'voidIn':
+                return run(canclein)(bot, msg)
+            case 'voidOut':
+                return run(cancleUSDT)(bot, msg)
+            case 'void':
+                return run(cancleReply)(bot, msg)
+            case 'bill': {
+                const target = replyUser(msg)
+                if (target.userid || target.name) {
+                    return isAdmin(showMe)(bot, msg, target)
+                }
+                return isGroup(showMe)(bot, msg, {
+                    name: displayName(msg.from),
+                    userid: msg.from.id,
+                })
+            }
+            default:
+                return
         }
-    };
+    })
+}
 
-    bot.sendMessage(chatId, '点击按钮开始记账', options);
-});
-
-bot.onText(/^开始$/,(msg) => {
-    isGroup(startbot)(bot,msg)
-})
-
-bot.onText(/^上课$/,(msg) => {
-    isAdmin(lock)(bot,msg,true)
-})
-
-bot.onText(/^下课$/,(msg) => {
-    isAdmin(lock)(bot,msg,false)
-})
-
-const pattern = /^(?:(?<text>[^\d+\/\s]+)\+|\+)?(?<num1>\d+(?:\.\d+)?)(?:\/(?<num2>\d+(?:\.\d+)?))?$/;
-bot.onText(pattern, (msg, match) => {
-    isAdmin(recordding) (bot,msg,match)
-});
-
-bot.onText(/^暂停$/,(msg) => {
-    isAdmin(stop)(bot,msg,false)
-})
-
-bot.onText(/^继续$/,(msg) => {
-    isAdmin(stop)(bot,msg,true)
-})
-
-bot.onText(/^设置汇率\+?([\d.]+)$/,(msg,match) => {
-    isAdmin(changEg)(bot,msg,match)
-})
-
-bot.onText(/^下发\+?([\d.]+)$/,(msg,match) => {
-    isAdmin(outusdt)(bot,msg,match)
-})
-
-bot.onText(/^清除账单$/,(msg) => {
-    isAdmin(clearAll)(bot,msg)
-})
-
-bot.onText(/^账单$/,(msg) => {
-    const tempname = ((msg.reply_to_message?.from?.first_name || '') + (msg.reply_to_message?.from?.last_name || '')) || null
-    if(tempname){
-        isAdmin(showMe)(bot,msg,tempname)
-    } else{
-        const name = (msg.from.first_name || '') + (msg.from.last_name || '')
-        isGroup(showMe)(bot,msg,name)
+async function main() {
+    if (!token) {
+        throw new Error('缺少 BOT_TOKEN')
     }
-})
+    await migrate()
+    const bot = new TelegramBot(token, { polling: true })
+    register(bot)
+    console.log('bot started')
+}
 
-bot.onText(/^撤销入款$/,(msg) => {
-    isAdmin(canclein)(bot,msg)
-})
-
-bot.onText(/^撤销下发$/,(msg) => {
-    isAdmin(cancleUSDT)(bot,msg)
+main().catch((err) => {
+    console.error('启动失败', err)
+    process.exit(1)
 })

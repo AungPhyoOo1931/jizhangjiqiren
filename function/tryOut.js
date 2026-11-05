@@ -11,19 +11,22 @@ const info = require('./info')
 async function tryOut(bot,msg){
     const chatId = msg.chat.id
     const userId = msg.from.id 
-    const nickName = (msg.from.first_name || "") + (msg.from.last_name || "")
-    const username = msg.from.username || ""
     try{
         const db = new DatabaseTransaction()
         const check = 'SELECT istry FROM users WHERE id = ?'
         const checkSql = await db.executeQuery(check,[userId],false)
+        if(checkSql.length === 0){
+            sendMessage(bot,'当前账户未注册，请先发送 /start',chatId)
+            return
+        }
         const isTry = checkSql[0].istry
         if(isTry){
             sendMessage(bot,'此账号已经试用过,无法重复试用',chatId)
             return
         }
         const updateStatusSQL = 'UPDATE users SET end = DATE_ADD(NOW(),INTERVAL 24 HOUR), istry = ?,active = ? WHERE id = ?'
-        const updateStatus = await db.executeQuery(updateStatusSQL,[true,true,userId],false) 
+        await db.executeQuery(updateStatusSQL,[true,true,userId],false)
+        await db.executeQuery('UPDATE groupList SET active = 1 WHERE userid = ?',[userId],false)
         const text = `
 【试用成功】
 试用成功！！！`

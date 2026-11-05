@@ -5,56 +5,51 @@
  * Year: 2025
  */
 
-const { DatabaseTransaction } = require("../module/mysql");
-const { sendMessage, normalSend } = require("../module/send");
-const {showAll} = require("../module/show");
+const { getReadyGroup } = require("../module/group");
+const { normalSend } = require("../module/send");
+const { showAll } = require("../module/show");
+const { replyUser } = require("../module/parse");
 
-async function recordding(bot,msg,match){
-    const groups = match.groups;
+async function recordding(bot,msg,cmd){
     const chatId = msg.chat.id
     const messageId = msg.message_id
-    let name = groups.text || null;
-    const amount = groups.num1;
-    let exchange = groups.num2 || null;
-    const username = msg.reply_to_message?.from?.username || null
-    const AdminId = msg.from.id
-    const tempname = ((msg.reply_to_message?.from?.first_name || '') + (msg.reply_to_message?.from?.last_name || '')) || null
+    const reply = replyUser(msg)
+    const name = reply.name || (cmd && cmd.name) || null
+    const username = reply.username
+    const userid = reply.userid
+    const amount = Number(cmd && cmd.amount)
+    let exchange = cmd && cmd.exchange
     try{
-        const db = new DatabaseTransaction()
-        const tempexchange = await db.executeQuery('SELECT echange,active,start FROM groupList WHERE id = ?',[chatId],false)
-        if(tempexchange.length === 0){
-            normalSend(bot,'当前群组未注册，请机器人拥有者发送‘开始’来注册并使用',chatId)
-            return 
-        }
-        if(tempexchange[0].start === 0){
-            normalSend(bot,'机器人暂停记账中，请先发送“继续”',chatId)
+        if(!Number.isFinite(amount) || amount === 0){
+            normalSend(bot,'请输入正确的金额',chatId)
             return
         }
-        
-        if(tempexchange[0].active !== 1){
-            normalSend(bot,'机器人已过期，请续费',chatId)
+        if(!name){
+            normalSend(bot,'请回复对方消息，或使用「张三+金额」指定入款人',chatId)
             return
         }
-    
-        if(tempname){
-            name = tempname
-        }
+        const ready = await getReadyGroup(bot, chatId)
+        if (!ready) return
+        const { db, group } = ready
         if(!exchange){
-            exchange = tempexchange[0].echange
+            exchange = group.echange
         }
-    
-        if(!name){         
+        if(!exchange || Number(exchange) === 0){
+            normalSend(bot,'汇率无效，请先发送「设置汇率7.20」',chatId)
             return
         }
-        const recordSql = 'INSERT INTO recording (name,username,groupid,adminid,amount,exchange,usdt,messageid) VALUE (?,?,?,?,?,?,?,?)'
-        await db.executeQuery(recordSql,[name,username,chatId,AdminId,amount,exchange,(amount / exchange),messageId],false)
-        console.log('成功');
-        showAll(bot,msg)
+        await db.executeQuery(
+            `INSERT INTO recording (name,username,userid,groupid,adminid,amount,exchange,usdt,messageid,shift_id)
+             VALUE (?,?,?,?,?,?,?,ROUND(? / ?, 2),?,?)`,
+            [name,username,userid,chatId,msg.from.id,amount,exchange,amount,exchange,messageId,group.shift_id],
+            false
+        )
+        await showAll(bot,msg,ready)
     }catch(err){
         console.log(err);
+        normalSend(bot,'记账失败，请稍后重试',chatId)
         return
     }
-
 }
 
 module.exports = recordding

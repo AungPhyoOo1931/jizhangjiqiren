@@ -21,11 +21,11 @@ async function start(bot,msg){
             return
         }
         const time = new Date()
-        const insertUser = await db.executeQuery('INSERT INTO users (id,username,nickname,end) VALUE (?,?,?,?)',[userId,username,nickName,time],false)
+        await db.executeQuery('INSERT INTO users (id,username,nickname,end) VALUE (?,?,?,?)',[userId,username,nickName,time],false)
         sendMessage(bot,'欢迎使用XX机器人',chatId)
     }catch(err){
-        // sendMessage(bot,'出现未知错误,删除后重试',chatId)
         console.log(err);
+        sendMessage(bot,'出现未知错误，请稍后重试',chatId)
         return
     }
 }
